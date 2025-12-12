@@ -2,34 +2,25 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Word Search 15×15</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Search 15x15</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
   <h1>Word Search</h1>
-  <div id="controls">
-    <button id="newBtn">New Puzzle</button>
-    <span id="status">Found <b id="foundCount">0</b> / <b id="wordCount">15</b></span>
-  </div>
+  <button id="newBtn">New Puzzle</button>
+  <span>Found <b id="foundCount">0</b> / <b id="wordCount">15</b></span>
 </header>
-
 <main>
   <section id="puzzleArea">
     <div id="grid"></div>
   </section>
-
   <aside id="sidebar">
-    <div id="word-list-title"><strong>Find these words</strong></div>
+    <h2>Find these words</h2>
     <ul id="word-list"></ul>
   </aside>
 </main>
-
-<footer>
-  <small>Tap first letter, then tap last letter to select a word (8 directions).</small>
-</footer>
-
 <script src="script.js"></script>
 </body>
 </html>
