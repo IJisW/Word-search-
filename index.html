@@ -3,15 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Word Search Game</title>
+  <title>Pixel Art App</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Word Search</h1>
-  <button id="refreshBtn">Refresh</button>
-  <div id="grid"></div>
-  <h2>Words to find:</h2>
-  <ul id="wordList"></ul>
+  <header>
+    <h1>Pixel Art App</h1>
+    <div id="controls">
+      <input type="color" id="colorPicker" value="#ff0000">
+      <button id="drawBtn">Draw</button>
+      <button id="eraseBtn">Erase</button>
+      <button id="clearBtn">Clear All</button>
+      <label>Layer:
+        <select id="layerSelect"></select>
+      </label>
+      <label>Opacity:
+        <input type="range" id="opacitySlider" min="0" max="1" step="0.05" value="1">
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <div id="canvasContainer"></div>
+  </main>
+
+  <footer>
+    <small>Tap pixels to draw. Layers with opacity supported!</small>
+  </footer>
 
   <script src="script.js"></script>
 </body>
