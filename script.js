@@ -1,144 +1,179 @@
-const grid = document.getElementById("grid");
-const refreshBtn = document.getElementById("refreshBtn");
-const wordListEl = document.getElementById("wordList");
-
-// 15x15 grid
+/* ---------- CONFIG ---------- */
 const GRID_SIZE = 15;
+const WORDS_TO_PICK = 15;
+const MIN_WORD_LENGTH = 3;
+const MAX_WORD_LENGTH = 15;
 
-// Words (mostly animals)
-const WORDS = ["LION","TIGER","BEAR","WOLF","FOX","DOG","CAT","EAGLE","SHARK","WHALE",
-               "ZEBRA","GIRAFFE","RHINO","HIPPO","PANDA","OWL","DEER","SNAKE","FROG",
-               "MONKEY","ANT","BEE","BAT","COW","PIG","SHEEP","GOAT","DUCK","HEN",
-               "FISH","HORSE","CAMEL","LEOPARD","PANTHER","CROCODILE","ALLIGATOR",
-               "FALCON","PARROT","SEAL","OTTER","RABBIT","SQUIRREL","MOUSE","RAT",
-               "LOBSTER","CRAB","TURTLE","KOALA","KANGAROO","WHIPPET"];
+/* ---------- DICTIONARY (~500 words, mostly animals) ---------- */
+const DICT_FINAL = []; 
+// Paste your 500+ word array from earlier here (DICTIONARY_FINAL)
+// Make sure all words are uppercase and letters only
 
-// grid array to store letters
-let gridArray = [];
-
-// words with positions
+/* ---------- GRID / GAME STATE ---------- */
+let grid = [];
 let placedWords = [];
+let firstPick = null;
+let foundCount = 0;
 
-function createEmptyGrid() {
-  gridArray = [];
-  for(let r=0;r<GRID_SIZE;r++){
-    const row = [];
-    for(let c=0;c<GRID_SIZE;c++){
-      row.push('');
-    }
-    gridArray.push(row);
-  }
+/* DOM references */
+const gridEl = document.getElementById("grid");
+const wordListEl = document.getElementById("word-list");
+const newBtn = document.getElementById("newBtn");
+const foundCountEl = document.getElementById("foundCount");
+const wordCountEl = document.getElementById("wordCount");
+
+/* ---------- HELPERS ---------- */
+function randomInt(n){ return Math.floor(Math.random()*n); }
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=randomInt(i+1); [arr[i],arr[j]]=[arr[j],arr[i]] } return arr }
+
+/* Create empty grid */
+function createEmptyGrid(){
+  grid = Array.from({length: GRID_SIZE}, ()=> Array(GRID_SIZE).fill(""));
 }
 
-function randomInt(min,max){return Math.floor(Math.random()*(max-min+1)+min);}
+/* Try to place word */
+function tryPlaceWord(word) {
+  const directions = [ [1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1] ];
+  const maxAttempts = 500;
+  for(let attempt=0; attempt<maxAttempts; attempt++){
+    const dir = directions[randomInt(directions.length)];
+    const rStart = randomInt(GRID_SIZE);
+    const cStart = randomInt(GRID_SIZE);
+    const rEnd = rStart + dir[1]*(word.length-1);
+    const cEnd = cStart + dir[0]*(word.length-1);
+    if(rEnd<0||rEnd>=GRID_SIZE||cEnd<0||cEnd>=GRID_SIZE) continue;
 
-// Directions: right, down, diagonal down-right
-const DIRECTIONS = [
-  {r:0,c:1}, // right
-  {r:1,c:0}, // down
-  {r:1,c:1}  // diagonal
-];
-
-function placeWord(word){
-  let attempts = 0;
-  while(attempts<100){
-    const dir = DIRECTIONS[randomInt(0,DIRECTIONS.length-1)];
-    const startRow = randomInt(0, GRID_SIZE-1);
-    const startCol = randomInt(0, GRID_SIZE-1);
-    let r=startRow,c=startCol;
-    let fits=true;
+    let ok=true; const coords=[];
+    for(let i=0;i<word.length;i++){
+      const r = rStart + dir[1]*i;
+      const c = cStart + dir[0]*i;
+      const ch = grid[r][c];
+      if(ch!==""&&ch!==word[i]){ok=false; break;}
+      coords.push({r,c});
+    }
+    if(!ok) continue;
 
     for(let i=0;i<word.length;i++){
-      if(r<0 || r>=GRID_SIZE || c<0 || c>=GRID_SIZE) {fits=false; break;}
-      if(gridArray[r][c]!=='' && gridArray[r][c]!==word[i]) {fits=false; break;}
-      r+=dir.r; c+=dir.c;
+      const {r,c}=coords[i]; grid[r][c]=word[i];
     }
-
-    if(fits){
-      r=startRow; c=startCol;
-      const positions=[];
-      for(let i=0;i<word.length;i++){
-        gridArray[r][c]=word[i];
-        positions.push({r,c});
-        r+=dir.r; c+=dir.c;
-      }
-      placedWords.push({word, positions});
-      return true;
-    }
-    attempts++;
+    return coords;
   }
-  return false;
+  return null;
 }
 
-function fillEmptyGrid(){
+/* Fill random letters */
+function fillRandom(){
   const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   for(let r=0;r<GRID_SIZE;r++){
     for(let c=0;c<GRID_SIZE;c++){
-      if(gridArray[r][c]==='') gridArray[r][c]=letters[randomInt(0,letters.length-1)];
+      if(grid[r][c]==="") grid[r][c]=letters[randomInt(letters.length)];
     }
   }
 }
 
+/* Render grid */
 function renderGrid(){
-  grid.innerHTML='';
+  gridEl.innerHTML="";
   for(let r=0;r<GRID_SIZE;r++){
     for(let c=0;c<GRID_SIZE;c++){
-      const cell=document.createElement('div');
-      cell.classList.add('cell');
-      cell.dataset.row=r;
-      cell.dataset.col=c;
-      cell.textContent=gridArray[r][c];
-      cell.addEventListener('click',()=>onCellClick(cell,r,c));
-      grid.appendChild(cell);
+      const cell=document.createElement("div");
+      cell.className="cell";
+      cell.dataset.r=r;
+      cell.dataset.c=c;
+      cell.textContent=grid[r][c];
+      cell.addEventListener("click", onCellClick);
+      gridEl.appendChild(cell);
     }
   }
 }
 
+/* Render word list */
 function renderWordList(){
-  wordListEl.innerHTML='';
-  for(const w of placedWords){
-    const li=document.createElement('li');
-    li.textContent=w.word;
+  wordListEl.innerHTML="";
+  for(let pw of placedWords){
+    const li=document.createElement("li");
+    li.textContent=pw.word;
+    li.id="word-"+pw.word;
+    if(pw.found) li.classList.add("found-word");
     wordListEl.appendChild(li);
   }
+  wordCountEl.textContent=placedWords.length;
 }
 
-function onCellClick(cell,r,c){
-  // check if cell is part of a word
-  for(const w of placedWords){
-    for(const pos of w.positions){
-      if(pos.r===r && pos.c===c){
-        // cross off all letters in that word
-        w.positions.forEach(p=>{
-          const idx=p.r*GRID_SIZE+p.c;
-          grid.children[idx].classList.add('found');
-        });
-        // cross off in word list
-        [...wordListEl.children].forEach(li=>{
-          if(li.textContent===w.word) li.classList.add('found-word');
-        });
-        return;
-      }
-    }
-  }
-  // optional: allow crossing single letters not part of words
-  cell.classList.toggle('found');
-}
-
-function generateGrid(){
+/* New puzzle */
+function newPuzzle(){
+  firstPick=null;
+  foundCount=0;
+  foundCountEl.textContent=foundCount;
   createEmptyGrid();
   placedWords=[];
-  const selectedWords = [];
-  while(selectedWords.length<15){
-    const w = WORDS[randomInt(0,WORDS.length-1)];
-    if(!selectedWords.includes(w)) selectedWords.push(w);
+  const pool=shuffle(DICT_FINAL.slice());
+  const chosen=[];
+  for(let word of pool){ if(chosen.length>=WORDS_TO_PICK) break; const w=word.replace(/_/g,""); if(w.length>=MIN_WORD_LENGTH && w.length<=MAX_WORD_LENGTH && !chosen.includes(w)) chosen.push(w); }
+  for(let w of chosen){
+    const coords=tryPlaceWord(w.toUpperCase());
+    if(coords) placedWords.push({word:w.toUpperCase(), coords:coords, found:false});
   }
-  selectedWords.forEach(w=>placeWord(w));
-  fillEmptyGrid();
+  fillRandom();
   renderGrid();
   renderWordList();
 }
 
-refreshBtn.addEventListener('click', generateGrid);
+/* Get cell element */
+function getCellEl(r,c){ return gridEl.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`); }
 
-generateGrid();
+/* Clear selections */
+function clearSelections(){ document.querySelectorAll(".cell.selected").forEach(el=>el.classList.remove("selected")); }
+
+/* Mark found word */
+function markFound(wordObj){
+  if(wordObj.found) return;
+  wordObj.found=true;
+  foundCount++;
+  foundCountEl.textContent=foundCount;
+  for(let p of wordObj.coords){
+    const el=getCellEl(p.r,p.c);
+    if(el){ el.classList.add("found"); el.classList.remove("selected"); }
+  }
+  const li=document.getElementById("word-"+wordObj.word);
+  if(li) li.classList.add("found-word");
+}
+
+/* Get straight line coordinates */
+function getLineCoords(r1,c1,r2,c2){
+  const dr=r2-r1, dc=c2-c1;
+  const steps=Math.max(Math.abs(dr),Math.abs(dc));
+  if(steps===0) return [{r:r1,c:c1}];
+  const stepR=dr===0?0:dr/steps;
+  const stepC=dc===0?0:dc/steps;
+  if(![-1,0,1].includes(stepR)||![-1,0,1].includes(stepC)) return null;
+  const coords=[];
+  for(let i=0;i<=steps;i++){
+    const r=r1+stepR*i, c=c1+stepC*i;
+    if(r<0||r>=GRID_SIZE||c<0||c>=GRID_SIZE) return null;
+    coords.push({r,c});
+  }
+  return coords;
+}
+
+/* Handle cell click */
+function onCellClick(e){
+  const el=e.currentTarget;
+  const r=parseInt(el.dataset.r,10);
+  const c=parseInt(el.dataset.c,10);
+  if(!firstPick){ firstPick={r,c}; clearSelections(); el.classList.add("selected"); return; }
+  const path=getLineCoords(firstPick.r, firstPick.c, r, c);
+  if(!path){ firstPick={r,c}; clearSelections(); el.classList.add("selected"); return; }
+  clearSelections();
+  for(let p of path){ const cel=getCellEl(p.r,p.c); if(cel) cel.classList.add("selected"); }
+  const sel=path.map(p=>grid[p.r][p.c]).join("");
+  const selRev=sel.split("").reverse().join("");
+  const match=placedWords.find(pw=>!pw.found&&(pw.word===sel||pw.word===selRev));
+  if(match){ markFound(match); if(foundCount>=placedWords.length) setTimeout(()=>alert("Nice! You found all words! 🎉"),100); }
+  else setTimeout(()=>clearSelections(),400);
+  firstPick=null;
+}
+
+/* Init */
+newBtn.addEventListener("click",()=>{ newPuzzle(); newBtn.disabled=true; setTimeout(()=>newBtn.disabled=false,300); });
+newPuzzle();
