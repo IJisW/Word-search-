@@ -1,76 +1,63 @@
 const GRID_SIZE = 15;
 const WORDS_TO_PICK = 15;
-const MIN_WORD_LENGTH = 3;
-const MAX_WORD_LENGTH = 15;
 
-/* Small dictionary for example, replace with your 500 words */
+/* Example small dictionary, replace with ~500 words as needed */
 const DICT_FINAL = ["CAT","DOG","LION","TIGER","BEAR","WOLF","FOX","DEER","MOOSE","MONKEY","GORILLA","ELEPHANT","ZEBRA","KANGAROO","KOALA"];
 
-/* GAME STATE */
 let grid = [];
 let placedWords = [];
 let firstPick = null;
 let foundCount = 0;
 
-/* DOM */
 const gridEl = document.getElementById("grid");
 const wordListEl = document.getElementById("word-list");
 const newBtn = document.getElementById("newBtn");
 const foundCountEl = document.getElementById("foundCount");
 const wordCountEl = document.getElementById("wordCount");
 
-/* HELPERS */
 function randomInt(n){ return Math.floor(Math.random()*n); }
 function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=randomInt(i+1); [arr[i],arr[j]]=[arr[j],arr[i]] } return arr }
 
-/* EMPTY GRID */
-function createEmptyGrid(){
-  grid = Array.from({length:GRID_SIZE},()=> Array(GRID_SIZE).fill(""));
-}
+function createEmptyGrid(){ grid = Array.from({length:GRID_SIZE},()=> Array(GRID_SIZE).fill("")); }
 
-/* PLACE WORD IN RANDOM DIRECTION */
 function tryPlaceWord(word){
   const directions = [
-    [1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]
+    [0,1],[1,0],[0,-1],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1] // horizontal, vertical, diagonals
   ];
   for(let attempt=0; attempt<500; attempt++){
     const dir = directions[randomInt(directions.length)];
     const rStart = randomInt(GRID_SIZE);
     const cStart = randomInt(GRID_SIZE);
-    const rEnd = rStart + dir[1]*(word.length-1);
-    const cEnd = cStart + dir[0]*(word.length-1);
-    if(rEnd<0 || rEnd>=GRID_SIZE || cEnd<0 || cEnd>=GRID_SIZE) continue;
-
-    let ok = true;
-    const coords = [];
+    const rEnd = rStart + dir[0]*(word.length-1);
+    const cEnd = cStart + dir[1]*(word.length-1);
+    if(rEnd<0||rEnd>=GRID_SIZE||cEnd<0||cEnd>=GRID_SIZE) continue;
+    let ok=true;
+    const coords=[];
     for(let i=0;i<word.length;i++){
-      const r = rStart + dir[1]*i;
-      const c = cStart + dir[0]*i;
-      if(grid[r][c]!=="" && grid[r][c]!==word[i]){ ok=false; break; }
+      const r=rStart+dir[0]*i;
+      const c=cStart+dir[1]*i;
+      if(grid[r][c]!="" && grid[r][c]!=word[i]){ ok=false; break; }
       coords.push({r,c});
     }
     if(!ok) continue;
-
     for(let i=0;i<word.length;i++){
-      const {r,c} = coords[i];
-      grid[r][c] = word[i];
+      const {r,c}=coords[i];
+      grid[r][c]=word[i];
     }
     return coords;
   }
   return null;
 }
 
-/* FILL EMPTY CELLS */
 function fillRandom(){
   const alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   for(let r=0;r<GRID_SIZE;r++){
     for(let c=0;c<GRID_SIZE;c++){
-      if(grid[r][c]==="") grid[r][c]=alphabet[randomInt(alphabet.length)];
+      if(grid[r][c]=="") grid[r][c]=alphabet[randomInt(alphabet.length)];
     }
   }
 }
 
-/* RENDER GRID */
 function renderGrid(){
   gridEl.innerHTML="";
   for(let r=0;r<GRID_SIZE;r++){
@@ -86,7 +73,6 @@ function renderGrid(){
   }
 }
 
-/* RENDER WORD LIST */
 function renderWordList(){
   wordListEl.innerHTML="";
   for(let pw of placedWords){
@@ -99,13 +85,8 @@ function renderWordList(){
   wordCountEl.textContent=placedWords.length;
 }
 
-/* GET CELL ELEMENT */
 function getCellEl(r,c){ return gridEl.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`); }
-
-/* CLEAR SELECTIONS */
 function clearSelections(){ document.querySelectorAll(".cell.selected").forEach(el=>el.classList.remove("selected")); }
-
-/* MARK FOUND WORD */
 function markFound(wordObj){
   if(wordObj.found) return;
   wordObj.found=true;
@@ -119,7 +100,6 @@ function markFound(wordObj){
   if(li) li.classList.add("found-word");
 }
 
-/* GET LINE COORDS */
 function getLineCoords(r1,c1,r2,c2){
   const dr=r2-r1;
   const dc=c2-c1;
@@ -132,13 +112,11 @@ function getLineCoords(r1,c1,r2,c2){
   for(let i=0;i<=steps;i++){
     const r=r1+stepR*i;
     const c=c1+stepC*i;
-    if(r<0||r>=GRID_SIZE||c<0||c>=GRID_SIZE) return null;
     coords.push({r,c});
   }
   return coords;
 }
 
-/* HANDLE CELL CLICK */
 function onCellClick(e){
   const el=e.currentTarget;
   const r=parseInt(el.dataset.r,10);
@@ -157,7 +135,6 @@ function onCellClick(e){
   firstPick=null;
 }
 
-/* CREATE NEW PUZZLE */
 function newPuzzle(){
   firstPick=null;
   foundCount=0;
