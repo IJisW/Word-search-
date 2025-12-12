@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Word Search 15x15</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Word Search — 15×15</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header>
+    <h1>Word Search</h1>
+    <div id="controls">
+      <button id="newBtn">New Puzzle</button>
+      <span id="status">Found <b id="foundCount">0</b> / <b id="wordCount">15</b></span>
+    </div>
+  </header>
 
-<header>
-  <h1>Word Search</h1>
-  <div>
-    <button id="newBtn">New Puzzle</button>
-    Found <b id="foundCount">0</b> / <b id="wordCount">15</b>
-  </div>
-</header>
+  <main>
+    <section id="puzzleArea">
+      <div id="grid" aria-label="Word search grid"></div>
+    </section>
 
-<main>
-  <section id="puzzleArea">
-    <div id="grid"></div>
-  </section>
-  <aside id="sidebar">
-    <strong>Find these words</strong>
-    <ul id="word-list"></ul>
-  </aside>
-</main>
+    <aside id="sidebar">
+      <div id="word-list-title"><strong>Find these words</strong></div>
+      <ul id="word-list"></ul>
+    </aside>
+  </main>
 
-<footer>
-  Tap first letter → tap last letter to select a word (all 8 directions)
-</footer>
+  <footer>
+    <small>Tap the first letter, then tap the last letter to select a word (works in all 8 directions).</small>
+  </footer>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
