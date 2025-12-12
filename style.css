@@ -42,11 +42,10 @@ button:active{transform:translateY(1px);}
 
 main{
   display:flex;
-  gap:12px;
-  padding:10px 12px 20px;
   flex-wrap:wrap;
   justify-content:center;
-  align-items:flex-start;
+  gap:12px;
+  padding:10px 12px 20px;
 }
 
 /* GRID AREA */
@@ -55,13 +54,12 @@ main{
   padding:6px;
   border-radius:12px;
   box-shadow:0 4px 12px rgba(10,10,20,0.06);
-  width:100%;
-  max-width:500px;  /* makes the grid fit nicely on phones */
-  aspect-ratio:1/1; /* keeps it square */
   display:grid;
   grid-template-columns:repeat(15,1fr);
   grid-template-rows:repeat(15,1fr);
   gap: var(--gap);
+  max-width:90vw;
+  aspect-ratio:1/1;
 }
 
 /* GRID CELLS */
@@ -75,31 +73,30 @@ main{
   border:1px solid #e7e7ea;
   background:#fff;
   user-select:none;
-  touch-action: manipulation;
 }
 .cell.selected{background:var(--selected);}
 .cell.found{background:var(--found); border-color:#a7e4a7;}
 
 /* SIDEBAR */
 #sidebar{
-  width:200px;
-  max-height:80vh;
+  max-height:90vh;
   overflow-y:auto;
-  display:flex;
-  flex-direction:column;
+  width:200px;
+  flex-shrink:0;
 }
 
 #word-list-title{
   margin-bottom:6px;
   font-weight:700;
 }
+
 #word-list{
   list-style:none;
   padding:8px;
   margin:0;
   background:var(--card);
   border-radius:8px;
-  flex:1; /* make it fill the sidebar and scroll */
+  max-height:calc(90vh - 30px);
   overflow-y:auto;
 }
 #word-list li{
@@ -130,7 +127,6 @@ footer{
   }
   #sidebar{
     width:90%;
-    max-width:350px;
     margin-top:12px;
   }
   #puzzleArea{
