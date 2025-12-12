@@ -1,34 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pixel Art App</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Word Search — 15×15</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>Pixel Art App</h1>
+    <h1>Word Search</h1>
     <div id="controls">
-      <input type="color" id="colorPicker" value="#ff0000">
-      <button id="drawBtn">Draw</button>
-      <button id="eraseBtn">Erase</button>
-      <button id="clearBtn">Clear All</button>
-      <label>Layer:
-        <select id="layerSelect"></select>
-      </label>
-      <label>Opacity:
-        <input type="range" id="opacitySlider" min="0" max="1" step="0.05" value="1">
-      </label>
+      <button id="newBtn">New Puzzle</button>
+      <span id="status">Found <b id="foundCount">0</b> / <b id="wordCount">15</b></span>
     </div>
   </header>
 
   <main>
-    <div id="canvasContainer"></div>
+    <section id="puzzleArea">
+      <div id="grid" aria-label="Word search grid"></div>
+    </section>
+
+    <aside id="sidebar">
+      <div id="word-list-title"><strong>Find these words</strong></div>
+      <ul id="word-list"></ul>
+    </aside>
   </main>
 
   <footer>
-    <small>Tap pixels to draw. Layers with opacity supported!</small>
+    <small>Tap the first letter, then tap the last letter to select a word (works in all 8 directions).</small>
   </footer>
 
   <script src="script.js"></script>
