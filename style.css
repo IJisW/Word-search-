@@ -26,8 +26,10 @@ main{
   gap:10px;
 }
 
-#puzzleArea{
+#puzzleArea {
   width: calc(var(--cell-size) * var(--grid-size) + var(--gap) * (var(--grid-size)-1));
+  transform: scale(0.92); /* slightly smaller, 92% of original size */
+  transform-origin: top left;
 }
 
 #grid{
