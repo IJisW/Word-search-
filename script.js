@@ -1,8 +1,6 @@
 const GRID_SIZE = 15;
 const WORDS_TO_PICK = 15;
-
-/* Example small dictionary, replace with ~500 words as needed */
-const DICT_FINAL = ["CAT","DOG","LION","TIGER","BEAR","WOLF","FOX","DEER","MOOSE","MONKEY","GORILLA","ELEPHANT","ZEBRA","KANGAROO","KOALA"];
+const DICT_FINAL = ["CAT","DOG","LION","TIGER","BEAR","WOLF","FOX","DEER","MOOSE","MONKEY","GORILLA","ELEPHANT","ZEBRA","KANGAROO","KOALA","PANDA","SLOTH","RACCOON"];
 
 let grid = [];
 let placedWords = [];
@@ -21,15 +19,13 @@ function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=randomInt(i+1); 
 function createEmptyGrid(){ grid = Array.from({length:GRID_SIZE},()=> Array(GRID_SIZE).fill("")); }
 
 function tryPlaceWord(word){
-  const directions = [
-    [0,1],[1,0],[0,-1],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1] // horizontal, vertical, diagonals
-  ];
+  const directions=[[0,1],[1,0],[0,-1],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
   for(let attempt=0; attempt<500; attempt++){
-    const dir = directions[randomInt(directions.length)];
-    const rStart = randomInt(GRID_SIZE);
-    const cStart = randomInt(GRID_SIZE);
-    const rEnd = rStart + dir[0]*(word.length-1);
-    const cEnd = cStart + dir[1]*(word.length-1);
+    const dir=directions[randomInt(directions.length)];
+    const rStart=randomInt(GRID_SIZE);
+    const cStart=randomInt(GRID_SIZE);
+    const rEnd=rStart+dir[0]*(word.length-1);
+    const cEnd=cStart+dir[1]*(word.length-1);
     if(rEnd<0||rEnd>=GRID_SIZE||cEnd<0||cEnd>=GRID_SIZE) continue;
     let ok=true;
     const coords=[];
@@ -40,10 +36,7 @@ function tryPlaceWord(word){
       coords.push({r,c});
     }
     if(!ok) continue;
-    for(let i=0;i<word.length;i++){
-      const {r,c}=coords[i];
-      grid[r][c]=word[i];
-    }
+    for(let i=0;i<word.length;i++){ const {r,c}=coords[i]; grid[r][c]=word[i]; }
     return coords;
   }
   return null;
@@ -109,11 +102,7 @@ function getLineCoords(r1,c1,r2,c2){
   const stepC=dc/steps;
   if(![-1,0,1].includes(stepR)||![-1,0,1].includes(stepC)) return null;
   const coords=[];
-  for(let i=0;i<=steps;i++){
-    const r=r1+stepR*i;
-    const c=c1+stepC*i;
-    coords.push({r,c});
-  }
+  for(let i=0;i<=steps;i++){ coords.push({r:r1+stepR*i,c:c1+stepC*i}); }
   return coords;
 }
 
