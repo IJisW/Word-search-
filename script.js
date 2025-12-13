@@ -14,7 +14,7 @@ const foundCountEl = document.getElementById("foundCount");
 const wordCountEl = document.getElementById("wordCount");
 
 function randomInt(n){ return Math.floor(Math.random()*n); }
-function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=randomInt(i+1); [arr[i],arr[j]]=[arr[j],arr[i]] } return arr }
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=randomInt(i+1); [arr[i],arr[j]]=[arr[j],arr[i]] } return arr; }
 
 function createEmptyGrid(){ grid = Array.from({length:GRID_SIZE},()=> Array(GRID_SIZE).fill("")); }
 
@@ -100,7 +100,7 @@ function getLineCoords(r1,c1,r2,c2){
   if(steps===0) return [{r:r1,c:c1}];
   const stepR=dr/steps;
   const stepC=dc/steps;
-  if(!Number.isInteger(stepR) || !Number.isInteger(stepC)) return null; // ensures straight line
+  if(!Number.isInteger(stepR) || !Number.isInteger(stepC)) return null;
   const coords=[];
   for(let i=0;i<=steps;i++){ coords.push({r:r1+stepR*i,c:c1+stepC*i}); }
   return coords;
@@ -111,8 +111,7 @@ function onCellClick(e){
   const r=parseInt(el.dataset.r,10);
   const c=parseInt(el.dataset.c,10);
   if(!firstPick){ firstPick={r,c}; clearSelections(); el.classList.add("selected"); return; }
-  const second={r,c};
-  const path=getLineCoords(firstPick.r,firstPick.c,second.r,second.c);
+  const path=getLineCoords(firstPick.r,firstPick.c,r,c);
   if(!path){ firstPick={r,c}; clearSelections(); el.classList.add("selected"); return; }
   clearSelections();
   for(let p of path){ const cel=getCellEl(p.r,p.c); if(cel) cel.classList.add("selected"); }
@@ -124,7 +123,6 @@ function onCellClick(e){
   firstPick=null;
 }
 
-// ✅ FIXED newPuzzle
 function newPuzzle(){
   firstPick = null;
   foundCount = 0;
@@ -132,20 +130,18 @@ function newPuzzle(){
   createEmptyGrid();
   placedWords = [];
 
-  // Only words that fit the grid
   const pool = shuffle(DICT_FINAL.filter(w => w.length <= GRID_SIZE));
   let chosen = [];
   let attempts = 0;
-  const maxAttempts = 10000;
 
-  while(chosen.length < WORDS_TO_PICK && attempts < maxAttempts){
-    if(pool.length === 0) break;
+  while (chosen.length < WORDS_TO_PICK && attempts < 10000) {
+    if (pool.length === 0) break;
     const idx = randomInt(pool.length);
     const word = pool[idx].toUpperCase();
     const coords = tryPlaceWord(word);
     if(coords){
       chosen.push({word, coords, found:false});
-      pool.splice(idx,1); // remove used word
+      pool.splice(idx,1);
     }
     attempts++;
   }
