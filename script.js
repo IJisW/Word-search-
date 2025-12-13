@@ -2,7 +2,6 @@ const GRID_SIZE = 15;
 const WORDS_TO_PICK = 15;
 const DICT_FINAL = ["CAT","DOG","LION","TIGER","BEAR","WOLF","FOX","DEER","MOOSE","MONKEY","GORILLA","ELEPHANT","ZEBRA","KANGAROO","KOALA","PANDA","SLOTH","RACCOON","ANTHONY","DYLAN","REX","IRA","GLOVING","REMY","APPLE","ORANGE","BANANA","GRAPE","PEACH","CHERRY","MANGO","BERRY","LEMON","LIME","COOKIE","BROWNIE","DONUT","MUFFIN","PANCAKE","WAFFLE","CEREAL","MILK","CHEESE","BUTTER","PIZZA","BURGER","TACO","SANDWICH","NOODLES","SOUP","SALAD","SCHOOL","LOCKER","BACKPACK","PENCIL","PEN","ERASER","MARKER","CRAYON","NOTEBOOK","PAPER","FOLDER","BINDER","HOMEWORK","PROJECT","QUIZ","TEST","EXAM","MATH","SCIENCE","HISTORY","ENGLISH","ART","MUSIC","BAND","CHOIR","ORCHESTRA","GYM","SPORTS","SOCCER","BASKETBALL","FOOTBALL","BASEBALL","HOCKEY","TENNIS","TRACK","FIELD","RUN","JUMP","CLIMB","SWIM","WINTER","SPRING","SUMMER","FALL","SNOW","RAIN","CLOUD","STORM","WIND","SUN","MOON","STAR","SKY","ICE","FROST","LEAF","TREE","FOREST","RIVER","LAKE","OCEAN","BEACH","MOUNTAIN","HILL","VALLEY","DESERT","ISLAND","PUMPKIN","GHOST","WITCH","BAT","SPIDER","SKELETON","COSTUME","CANDY","MASK","HAUNTED","COFFIN","GRAVE","CHRISTMAS","SANTA","ELF","REINDEER","SLEIGH","PRESENT","WRAP","RIBBON","TREE","ORNAMENT","LIGHTS","CAROL","COCOA","SCARF","MITTEN","JACKET","SWEATER","FIREPLACE","CHIMNEY","GAME","LEVEL","SCORE","POINT","TIMER","START","PAUSE","RESET","WIN","LOSE","PLAYER","TEAM","FRIEND","FAMILY","HOUSE","ROOM","DOOR","WINDOW","TABLE","CHAIR","BED","LAMP","CLOCK","PHONE","SCREEN","KEYBOARD","MOUSE","COMPUTER","CODE","SCRIPT","ARRAY","OBJECT","FUNCTION","DEBUG","ERROR","PIXEL","IMAGE","VIDEO","AUDIO","SOUND","MUSIC","RHYTHM","MELODY","COLOR","SHAPE","CIRCLE","SQUARE","TRIANGLE","LINE","PATTERN","DESIGN","CREATE","BUILD","DRAW","WRITE","READ","LEARN","THINK","PLAN","SOLVE","DISCOVER"];
 
-
 let grid = [];
 let placedWords = [];
 let firstPick = null;
@@ -101,7 +100,7 @@ function getLineCoords(r1,c1,r2,c2){
   if(steps===0) return [{r:r1,c:c1}];
   const stepR=dr/steps;
   const stepC=dc/steps;
-  if(![-1,0,1].includes(stepR)||![-1,0,1].includes(stepC)) return null;
+  if(!Number.isInteger(stepR) || !Number.isInteger(stepC)) return null; // ensures straight line
   const coords=[];
   for(let i=0;i<=steps;i++){ coords.push({r:r1+stepR*i,c:c1+stepC*i}); }
   return coords;
@@ -120,7 +119,7 @@ function onCellClick(e){
   let sel=path.map(p=>grid[p.r][p.c]).join("");
   let selRev=sel.split("").reverse().join("");
   const match=placedWords.find(pw=>!pw.found&&(pw.word===sel||pw.word===selRev));
-  if(match){ markFound(match); if(foundCount>=placedWords.length) setTimeout(()=>alert("Nice! You found all words! 🎉"),100);}
+  if(match){ markFound(match); if(foundCount>=placedWords.length) setTimeout(()=>alert("Nice! You found all words! 🎉"),100); }
   else setTimeout(()=>clearSelections(),400);
   firstPick=null;
 }
@@ -132,8 +131,7 @@ function newPuzzle(){
   createEmptyGrid();
   placedWords=[];
   const pool=shuffle(DICT_FINAL.slice());
-  const chosen=[];
-  for(let word of pool){ if(chosen.length>=WORDS_TO_PICK) break; if(!chosen.includes(word)) chosen.push(word); }
+  const chosen=pool.slice(0,WORDS_TO_PICK);
   for(let w of chosen){
     const coords=tryPlaceWord(w.toUpperCase());
     if(coords) placedWords.push({word:w.toUpperCase(),coords,found:false});
