@@ -142,4 +142,28 @@ function newPuzzle(){
 }
 
 newBtn.addEventListener("click",()=>{ newPuzzle(); newBtn.disabled=true; setTimeout(()=>newBtn.disabled=false,300); });
-newPuzzle();
+function newPuzzle(){
+  firstPick = null;
+  foundCount = 0;
+  foundCountEl.textContent = foundCount;
+  createEmptyGrid();
+  placedWords = [];
+
+  const pool = shuffle(DICT_FINAL.slice());
+  let chosen = [];
+  let i = 0;
+
+  // Keep trying until we place WORDS_TO_PICK words
+  while(chosen.length < WORDS_TO_PICK && i < pool.length){
+    const word = pool[i].toUpperCase();
+    const coords = tryPlaceWord(word);
+    if(coords) chosen.push({word, coords, found:false});
+    i++;
+  }
+
+  placedWords = chosen;
+  fillRandom();
+  renderGrid();
+  renderWordList();
+}
+
