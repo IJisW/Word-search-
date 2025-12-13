@@ -28,7 +28,7 @@ main{
 
 #puzzleArea {
   width: calc(var(--cell-size) * var(--grid-size) + var(--gap) * (var(--grid-size)-1));
-  transform: scale(0.80); /* slightly smaller, 92% of original size */
+  transform: scale(0.85);
   transform-origin: top left;
 }
 
@@ -50,10 +50,20 @@ main{
   font-weight:bold;
   font-size:16px;
   user-select:none;
+  cursor:pointer;
+  transition: background 0.2s, transform 0.1s;
 }
 
-.cell.selected{background:#ffeaa7}
-.cell.found{background:#d1ffd7; border-color:#7ed6df}
+.cell:hover{ transform: scale(1.05); }
+
+.cell.selected{
+  background:#ffeaa7;
+}
+
+.cell.found{
+  background:#d1ffd7; 
+  border-color:#7ed6df;
+}
 
 #sidebar{
   max-height:450px;
@@ -81,7 +91,18 @@ main{
 }
 
 @media(max-width:600px){
-  main{flex-direction:column; align-items:center;}
-  #sidebar{width:90%; max-height:200px;}
-  :root{--cell-size:28px;}
+  main{
+    flex-direction:column; 
+    align-items:center;
+  }
+  #sidebar{
+    width:90%; 
+    max-height:200px;
+  }
+  :root{
+    --cell-size:28px;
+  }
+  #puzzleArea{
+    transform: scale(0.9);
+  }
 }
