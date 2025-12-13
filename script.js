@@ -125,24 +125,6 @@ function onCellClick(e){
 }
 
 function newPuzzle(){
-  firstPick=null;
-  foundCount=0;
-  foundCountEl.textContent=foundCount;
-  createEmptyGrid();
-  placedWords=[];
-  const pool=shuffle(DICT_FINAL.slice());
-  const chosen=pool.slice(0,WORDS_TO_PICK);
-  for(let w of chosen){
-    const coords=tryPlaceWord(w.toUpperCase());
-    if(coords) placedWords.push({word:w.toUpperCase(),coords,found:false});
-  }
-  fillRandom();
-  renderGrid();
-  renderWordList();
-}
-
-newBtn.addEventListener("click",()=>{ newPuzzle(); newBtn.disabled=true; setTimeout(()=>newBtn.disabled=false,300); });
-function newPuzzle(){
   firstPick = null;
   foundCount = 0;
   foundCountEl.textContent = foundCount;
@@ -167,3 +149,5 @@ function newPuzzle(){
   renderWordList();
 }
 
+newBtn.addEventListener("click",()=>{ newPuzzle(); newBtn.disabled=true; setTimeout(()=>newBtn.disabled=false,300); });
+newPuzzle();
