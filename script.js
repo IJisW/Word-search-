@@ -100,7 +100,7 @@ function getLineCoords(r1,c1,r2,c2){
   if(steps===0) return [{r:r1,c:c1}];
   const stepR=dr/steps;
   const stepC=dc/steps;
-  if(!Number.isInteger(stepR) || !Number.isInteger(stepC)) return null; // ensures straight line
+  if(!Number.isInteger(stepR) || !Number.isInteger(stepC)) return null;
   const coords=[];
   for(let i=0;i<=steps;i++){ coords.push({r:r1+stepR*i,c:c1+stepC*i}); }
   return coords;
@@ -133,14 +133,21 @@ function newPuzzle(){
 
   const pool = shuffle(DICT_FINAL.slice());
   let chosen = [];
-  let i = 0;
+  let attempts = 0;
+  const maxAttempts = 1000; // prevent infinite loops
 
-  // Keep trying until we place WORDS_TO_PICK words
-  while(chosen.length < WORDS_TO_PICK && i < pool.length){
-    const word = pool[i].toUpperCase();
+  while(chosen.length < WORDS_TO_PICK && attempts < maxAttempts){
+    if(pool.length === 0) break; // no words left
+    const idx = randomInt(pool.length);
+    const word = pool[idx].toUpperCase();
     const coords = tryPlaceWord(word);
-    if(coords) chosen.push({word, coords, found:false});
-    i++;
+    if(coords){
+      chosen.push({word, coords, found:false});
+      pool.splice(idx,1); // remove used word
+    } else {
+      // try another word randomly
+      attempts++;
+    }
   }
 
   placedWords = chosen;
